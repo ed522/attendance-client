@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ed522.bcr2200.attendance.CodeViewController">
+   <center>
+      <Label fx:id="mainLabel" text="CODE NOT SET" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="80.0" />
+         </font>
+      </Label>
+   </center>
+   <bottom>
+       <HBox alignment="CENTER_RIGHT" prefHeight="65.0" prefWidth="640.0" BorderPane.alignment="CENTER_RIGHT">
+           <ImageView fx:id="networkGood" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@assets/32-network-good.png" />
+            <HBox.margin>
+               <Insets right="8.0" />
+            </HBox.margin>
+           </ImageView>
+
+           <ImageView fx:id="networkWarn" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@assets/32-network-warn.png" />
+            <HBox.margin>
+               <Insets right="8.0" />
+            </HBox.margin>
+           </ImageView>
+
+           <ImageView fx:id="networkErr" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+               <Image url="@assets/32-network-err.png" />
+            <HBox.margin>
+               <Insets right="8.0" />
+            </HBox.margin>
+           </ImageView>
+         <padding>
+            <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+         </padding>
+       </HBox>
+   </bottom>
+   <top>
+       <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="640.0" BorderPane.alignment="CENTER">
+           <padding>
+               <Insets left="16.0" right="16.0" />
+           </padding>
+           <ProgressBar fx:id="expiryBar" prefWidth="240.0" />
+           <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+           <Label fx:id="time" alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="181.0" text="TIME/DATE NOT SET.">
+            <font>
+               <Font size="17.0" />
+            </font></Label>
+       </HBox>
+   </top>
+</BorderPane>
