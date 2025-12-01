@@ -2,6 +2,7 @@ module com.ed522.bcr2200.attendance {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
+    requires com.google.gson;
 
 
     opens com.ed522.bcr2200.attendance to javafx.fxml;

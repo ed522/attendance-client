@@ -38,6 +38,11 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.13.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -60,7 +65,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.ed522.bcr2200.attendance/com.ed522.bcr2200.attendance.HelloApplication
+                            <mainClass>com.ed522.bcr2200.attendance/com.ed522.bcr2200.attendance.BaseApplication
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
