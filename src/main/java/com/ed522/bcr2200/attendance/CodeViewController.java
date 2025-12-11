@@ -16,6 +16,8 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -74,24 +76,22 @@ public class CodeViewController {
     }
 
     private VerificationCode generateCode(Instant generationInstant) throws InterruptedException {
+        System.out.println("generateCode");
         // six digits
         int code = random.nextInt(100_000_000);
         Instant expiry = this.server.sendCodeAndWait(new VerificationCode(code, generationInstant), -1);
+        System.out.println("sent");
         return new VerificationCode(code, expiry);
     }
 
     private void updateExpiryBar(int timeStep) {
-        
+
         if (this.generationInstant.equals(Instant.MIN) || this.expiryInstant.equals(Instant.MIN)) {
             return;
         }
 
-        double expiryTimeDelta = this.expiryInstant.minus(
-                Duration.ofMillis(this.generationInstant.toEpochMilli())
-        ).get(ChronoField.MILLI_OF_DAY);
-        double currentTimeDelta = Instant.now().minus(
-                Duration.ofMillis(this.generationInstant.toEpochMilli())
-        ).get(ChronoField.MILLI_OF_DAY);
+        double expiryTimeDelta = this.generationInstant.until(this.expiryInstant, ChronoUnit.MILLIS);
+        double currentTimeDelta = this.generationInstant.until(Instant.now(), ChronoUnit.MILLIS);
         double progress = currentTimeDelta / expiryTimeDelta;
 
         Platform.runLater(() -> this.expiryBar.setProgress(progress));
@@ -104,8 +104,13 @@ public class CodeViewController {
     }
     private void updateCodes(int unused) {
 
+        if (this.server.getState() != AttendanceEndpoint.ConnectionState.CONNECTED_GOOD) {
+            return;
+        }
+
         // check if they are expired
         if (this.expiryInstant.isBefore(Instant.now())) {
+            System.out.println("updateCodes");
             // regenerate
             this.generationInstant = Instant.now();
             VerificationCode code;
@@ -116,6 +121,7 @@ public class CodeViewController {
                 return;
             }
             this.expiryInstant = code.time();
+            Platform.runLater(() -> codeLabel1.setText(String.valueOf(code.value())));
             LOGGER.log(Level.FINE, "Generated new code " + code.value());
         }
 
@@ -128,10 +134,6 @@ public class CodeViewController {
 
     @FXML
     public void initialize() {
-
-        Future<?> task = this.communicatorExecutor.submit(() -> {
-
-        });
 
         this.expiryBar.setProgress(0d);
 
@@ -161,9 +163,7 @@ public class CodeViewController {
                     LOGGER.log(Level.SEVERE, "Got an IOException, trying again: " + e1.getMessage());
                 }
 
-                if (!task.isDone())
-                    throw new IllegalStateException("Not connected yet but second thread is running? - not trying again");
-                else try {
+                try {
                     this.server.communicate();
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, "Got an IOException! " + e.getMessage());

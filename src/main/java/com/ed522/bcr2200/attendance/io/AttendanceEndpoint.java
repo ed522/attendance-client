@@ -126,7 +126,7 @@ public class AttendanceEndpoint {
             throw new IllegalArgumentException("maxTries must be a positive number or 0, got " + maxTries);
 
         if (knownGoodHosts == null || knownGoodHosts.length == 0)
-            connectWithDiscovery("255.255.255.255", maxTries);
+            connectWithDiscovery("127.0.0.1", maxTries);
         else {
             this.setState(ConnectionState.SEARCHING_FOR_HOSTS);
             boolean couldConnect = false;
@@ -155,6 +155,7 @@ public class AttendanceEndpoint {
         this.codesToSend.add(code);
         this.waitLock.lock();
         this.newMessageCondition.signalAll();
+        this.waitLock.unlock();
     }
     public Instant sendCodeAndWait(VerificationCode code, long timeoutMillis) throws InterruptedException {
         Consumer<Instant> oldAction = this.onExpiryReceived;
@@ -164,7 +165,9 @@ public class AttendanceEndpoint {
 
         this.setOnExpiryReceived(i -> {
             valueHolder[0] = i;
+            lock.lock();
             lockCondition.signalAll();
+            lock.unlock();
         });
         this.sendCode(code);
         lock.lock();
@@ -172,8 +175,10 @@ public class AttendanceEndpoint {
         do {
             if (timeoutMillis <= 0) {
                 lockCondition.await();
+                lock.unlock();
             } else {
                 boolean val = lockCondition.await(timeoutMillis, TimeUnit.MILLISECONDS);
+                lock.unlock();
                 if (!val) return null;
             }
         } while (valueHolder[0] == null);
@@ -214,6 +219,8 @@ public class AttendanceEndpoint {
                 this.newMessageCondition.await(10_000, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 return;
+            } finally {
+                this.waitLock.unlock();
             }
 
             // make sure we are still connected
