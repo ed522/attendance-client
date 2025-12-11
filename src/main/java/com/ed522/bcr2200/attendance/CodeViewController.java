@@ -18,10 +18,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,18 +47,13 @@ public class CodeViewController {
     @FXML private ImageView networkErr;
 
     private final ScheduledExecutorService timedEventExecutor = Executors.newScheduledThreadPool(1);
-    private final ExecutorService communicatorExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService communicatorExecutor = Executors.newSingleThreadExecutor(Thread.ofPlatform().daemon().factory());
     private final Map<TimedTask, Integer> timedEvents = new HashMap<TimedTask, Integer>();
     private final SecureRandom random = new SecureRandom();
     private final AttendanceEndpoint server = new AttendanceEndpoint();
 
     private Instant expiryInstant = Instant.MIN;
     private Instant generationInstant = Instant.MIN;
-    private String[] allowedHosts = null;
-
-    public CodeViewController(String... allowedHosts) {
-        this.allowedHosts = allowedHosts;
-    }
 
     private void executeTimedTasks() {
 
@@ -137,15 +129,9 @@ public class CodeViewController {
     @FXML
     public void initialize() {
 
-        while (true) {
-            try {
-                this.server.connect(MAX_TRIES, allowedHosts);
-                break;
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "IOException caught: " + e.getMessage() + " - trying again");
-                // loop back around
-            }
-        }
+        Future<?> task = this.communicatorExecutor.submit(() -> {
+
+        });
 
         this.expiryBar.setProgress(0d);
 
@@ -161,10 +147,27 @@ public class CodeViewController {
         );
 
         this.communicatorExecutor.submit(() -> {
-            try {
-                this.server.communicate();
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Got an IOException! " + e.getMessage());
+
+            // always run this loop, when JVM terminates then this thread will die (daemon)
+
+            // an infinite loop is kind of the point
+            //noinspection InfiniteLoopStatement
+            while (true) {
+                // second loop: keep trying to connect (even with IOException) until it works
+                while (true) try {
+                    this.server.connect(MAX_TRIES, BaseApplication.getAllowedHosts());
+                    break;
+                } catch (IOException e1) {
+                    LOGGER.log(Level.SEVERE, "Got an IOException, trying again: " + e1.getMessage());
+                }
+
+                if (!task.isDone())
+                    throw new IllegalStateException("Not connected yet but second thread is running? - not trying again");
+                else try {
+                    this.server.communicate();
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Got an IOException! " + e.getMessage());
+                }
             }
         });
 

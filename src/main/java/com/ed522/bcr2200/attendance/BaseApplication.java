@@ -8,6 +8,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +17,11 @@ public class BaseApplication extends Application {
 
     public static final long VERSION = 0x1;
 
-    private String[] allowedHosts = new String[0];
+    private static String[] allowedHosts = new String[0];
+
+    public static String[] getAllowedHosts() {
+        return Arrays.copyOf(allowedHosts, allowedHosts.length);
+    }
 
     /**
      * Parse command line arguments, storing them away when necessary.
@@ -36,7 +41,7 @@ public class BaseApplication extends Application {
                 // consume host + an actual hostname
                 String hosts = args[index + 1];
                 Objects.requireNonNull(hosts, "Argument null?");
-                this.allowedHosts = hosts.split(",");
+                allowedHosts = hosts.split(",");
                 yield index + 2;
             }
             default -> {
@@ -59,7 +64,6 @@ public class BaseApplication extends Application {
         }
 
         FXMLLoader fxmlLoader = new FXMLLoader(BaseApplication.class.getResource("code-view.fxml"));
-        fxmlLoader.setController(new CodeViewController(allowedHosts));
         Scene scene = new Scene(fxmlLoader.load(), 800, 480);
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, k -> {
