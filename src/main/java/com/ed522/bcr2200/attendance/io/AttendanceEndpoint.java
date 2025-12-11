@@ -219,8 +219,6 @@ public class AttendanceEndpoint {
                 this.newMessageCondition.await(10_000, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 return;
-            } finally {
-                this.waitLock.unlock();
             }
 
             // make sure we are still connected

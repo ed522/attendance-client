@@ -76,11 +76,9 @@ public class CodeViewController {
     }
 
     private VerificationCode generateCode(Instant generationInstant) throws InterruptedException {
-        System.out.println("generateCode");
         // six digits
         int code = random.nextInt(100_000_000);
         Instant expiry = this.server.sendCodeAndWait(new VerificationCode(code, generationInstant), -1);
-        System.out.println("sent");
         return new VerificationCode(code, expiry);
     }
 
@@ -110,7 +108,6 @@ public class CodeViewController {
 
         // check if they are expired
         if (this.expiryInstant.isBefore(Instant.now())) {
-            System.out.println("updateCodes");
             // regenerate
             this.generationInstant = Instant.now();
             VerificationCode code;
