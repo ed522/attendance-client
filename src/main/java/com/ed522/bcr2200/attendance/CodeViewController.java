@@ -129,7 +129,17 @@ public class CodeViewController {
 
     @FXML
     public void initialize() {
-        
+
+        while (true) {
+            try {
+                this.server.connect(0, new String[0]);
+                break;
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "IOException caught: " + e.getMessage() + " - trying again");
+                // loop back around
+            }
+        }
+
         this.expiryBar.setProgress(0d);
 
         this.registerTask(this::updateExpiryBar, 0L);
