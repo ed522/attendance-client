@@ -63,7 +63,6 @@ public class AttendanceEndpoint {
         // compose handshake message
         JsonObject handshakeMessage = new JsonObject();
         handshakeMessage.addProperty("type", "connect");
-        System.out.println(handshakeMessage);
         out.write(handshakeMessage.toString().getBytes(StandardCharsets.UTF_8));
 
         // expect correct response
@@ -153,34 +152,24 @@ public class AttendanceEndpoint {
     }
 
     public void sendCode(VerificationCode code) {
-        System.out.println("add");
         this.codesToSend.add(code);
-        System.out.println("signal");
         this.waitLock.lock();
         this.newMessageCondition.signalAll();
     }
     public Instant sendCodeAndWait(VerificationCode code, long timeoutMillis) throws InterruptedException {
-        System.out.println("enter send");
         Consumer<Instant> oldAction = this.onExpiryReceived;
         final Instant[] valueHolder = {null};
         final Lock lock = new ReentrantLock();
         final Condition lockCondition = lock.newCondition();
 
-
-        System.out.println("setup done");
         this.setOnExpiryReceived(i -> {
-            System.out.println("!!got value");
             valueHolder[0] = i;
-            System.out.println("!!signal");
             lockCondition.signalAll();
         });
-        System.out.println("before code sent");
         this.sendCode(code);
-        System.out.println("code sent");
         lock.lock();
 
         do {
-            System.out.println("enter wait loop");
             if (timeoutMillis <= 0) {
                 lockCondition.await();
             } else {
@@ -188,7 +177,6 @@ public class AttendanceEndpoint {
                 if (!val) return null;
             }
         } while (valueHolder[0] == null);
-        System.out.println("done");
         this.setOnExpiryReceived(oldAction);
 
         return valueHolder[0];
