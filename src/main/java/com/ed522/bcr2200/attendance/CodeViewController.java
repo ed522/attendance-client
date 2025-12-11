@@ -120,7 +120,7 @@ public class CodeViewController {
             Platform.runLater(() -> codeLabel1.setText(String.valueOf(code1.value())));
             Platform.runLater(() -> codeLabel2.setText(String.valueOf(code2.value())));
             Platform.runLater(() -> codeLabel3.setText(String.valueOf(code3.value())));
-            LOGGER.log(Level.FINE, "Generated new codes %d, %d and %d".formatted(code1.value(), code2.value(), code3.value()));
+            LOGGER.log(Level.INFO, "Generated new codes %d, %d and %d".formatted(code1.value(), code2.value(), code3.value()));
         }
 
     }
