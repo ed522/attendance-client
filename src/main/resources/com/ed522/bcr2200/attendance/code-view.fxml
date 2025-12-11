@@ -6,16 +6,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ed522.bcr2200.attendance.CodeViewController">
-   <center>
-      <Label fx:id="mainLabel" text="CODE NOT SET" BorderPane.alignment="CENTER">
-         <font>
-            <Font size="80.0" />
-         </font>
-      </Label>
-   </center>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ed522.bcr2200.attendance.CodeViewController">
    <bottom>
-       <HBox alignment="CENTER_RIGHT" prefHeight="65.0" prefWidth="640.0" BorderPane.alignment="CENTER_RIGHT">
+       <HBox alignment="CENTER_RIGHT" prefHeight="65.0" prefWidth="800.0" BorderPane.alignment="CENTER_RIGHT">
            <ImageView fx:id="networkGood" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                <Image url="@assets/32-network-good.png" />
             <HBox.margin>
@@ -42,7 +35,7 @@
        </HBox>
    </bottom>
    <top>
-       <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="640.0" BorderPane.alignment="CENTER">
+       <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="800.0" BorderPane.alignment="CENTER">
            <padding>
                <Insets left="16.0" right="16.0" />
            </padding>
@@ -54,4 +47,25 @@
             </font></Label>
        </HBox>
    </top>
+   <center>
+       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+
+           <Label fx:id="codeLabel1" alignment="BOTTOM_CENTER" contentDisplay="BOTTOM" text="CODE1 NOT SET" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+               <font>
+                   <Font size="70.0" />
+               </font>
+           </Label>
+           <Label fx:id="codeLabel2" alignment="CENTER" contentDisplay="CENTER" prefWidth="604.0" text="CODE2 NOT SET" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+               <font>
+                   <Font size="70.0" />
+               </font>
+           </Label>
+           <Label fx:id="codeLabel3" alignment="TOP_CENTER" contentDisplay="TOP" text="CODE3 NOT SET" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+               <font>
+                   <Font size="70.0" />
+               </font>
+           </Label>
+
+       </VBox>
+   </center>
 </BorderPane>
