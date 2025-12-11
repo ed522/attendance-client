@@ -13,11 +13,8 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -50,7 +47,7 @@ public class CodeViewController {
 
     private final ScheduledExecutorService timedEventExecutor = Executors.newScheduledThreadPool(1);
     private final ExecutorService communicatorExecutor = Executors.newSingleThreadExecutor(Thread.ofPlatform().daemon().factory());
-    private final Map<TimedTask, Integer> timedEvents = new HashMap<TimedTask, Integer>();
+    private final Map<TimedTask, Integer> timedEvents = new HashMap<>();
     private final SecureRandom random = new SecureRandom();
     private final AttendanceEndpoint server = new AttendanceEndpoint();
 
@@ -110,16 +107,20 @@ public class CodeViewController {
         if (this.expiryInstant.isBefore(Instant.now())) {
             // regenerate
             this.generationInstant = Instant.now();
-            VerificationCode code;
+            VerificationCode code1, code2, code3;
             // if we get interrupted then give up early
             try {
-                code = this.generateCode(generationInstant);
+                code1 = this.generateCode(generationInstant);
+                code2 = this.generateCode(generationInstant);
+                code3 = this.generateCode(generationInstant);
             } catch (InterruptedException e) {
                 return;
             }
-            this.expiryInstant = code.time();
-            Platform.runLater(() -> codeLabel1.setText(String.valueOf(code.value())));
-            LOGGER.log(Level.FINE, "Generated new code " + code.value());
+            this.expiryInstant = code1.time();
+            Platform.runLater(() -> codeLabel1.setText(String.valueOf(code1.value())));
+            Platform.runLater(() -> codeLabel2.setText(String.valueOf(code2.value())));
+            Platform.runLater(() -> codeLabel3.setText(String.valueOf(code3.value())));
+            LOGGER.log(Level.FINE, "Generated new codes %d, %d and %d".formatted(code1.value(), code2.value(), code3.value()));
         }
 
     }
@@ -144,6 +145,26 @@ public class CodeViewController {
                 this::executeTimedTasks, 0 /* ms initial delay */,
                 TICK_DELAY_MS /* ms, per tick */, TimeUnit.MILLISECONDS
         );
+
+        this.server.registerConnectionStateListener(state -> {
+            switch (state) {
+                case CONNECTING, CONNECTED_PROBLEM -> {
+                    this.networkGood.setVisible(false);
+                    this.networkWarn.setVisible(true);
+                    this.networkErr.setVisible(false);
+                }
+                case CONNECTED_GOOD -> {
+                    this.networkGood.setVisible(true);
+                    this.networkWarn.setVisible(false);
+                    this.networkErr.setVisible(false);
+                }
+                case DISCONNECTED -> {
+                    this.networkGood.setVisible(false);
+                    this.networkWarn.setVisible(false);
+                    this.networkErr.setVisible(true);
+                }
+            }
+        });
 
         this.communicatorExecutor.submit(() -> {
 
