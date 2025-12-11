@@ -28,6 +28,8 @@ import java.util.logging.Logger;
 
 public class CodeViewController {
 
+    public static final int MAX_TRIES = 0;
+
     /**
      * A callback for a task that should be run periodically.
      * @param initialCounter The counter value to set initially. Zero signifies a task to run every tick
@@ -55,6 +57,11 @@ public class CodeViewController {
 
     private Instant expiryInstant = Instant.MIN;
     private Instant generationInstant = Instant.MIN;
+    private String[] allowedHosts = null;
+
+    public CodeViewController(String... allowedHosts) {
+        this.allowedHosts = allowedHosts;
+    }
 
     private void executeTimedTasks() {
 
@@ -132,7 +139,7 @@ public class CodeViewController {
 
         while (true) {
             try {
-                this.server.connect(0, new String[0]);
+                this.server.connect(MAX_TRIES, allowedHosts);
                 break;
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "IOException caught: " + e.getMessage() + " - trying again");
