@@ -370,6 +370,7 @@ public class AttendanceEndpoint {
         DatagramSocket datagramSocket = new DatagramSocket();
 
         // broadcast to find any available servers
+        datagramSocket.setOption(StandardSocketOptions.SO_BROADCAST, true);
         datagramSocket.connect(new InetSocketAddress(host, PORT));
 
         // look for hosts
