@@ -126,7 +126,7 @@ public class AttendanceEndpoint {
             throw new IllegalArgumentException("maxTries must be a positive number or 0, got " + maxTries);
 
         if (knownGoodHosts == null || knownGoodHosts.length == 0)
-            connectWithDiscovery("127.0.0.1", maxTries);
+            connectWithDiscovery("255.255.255.255", maxTries);
         else {
             this.setState(ConnectionState.SEARCHING_FOR_HOSTS);
             boolean couldConnect = false;
