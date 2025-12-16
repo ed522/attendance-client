@@ -54,6 +54,10 @@ public class CodeViewController {
     private Instant expiryInstant = Instant.MIN;
     private Instant generationInstant = Instant.MIN;
 
+    public void forceCodeGeneration() {
+        this.expiryInstant = Instant.MIN;
+    }
+
     private void executeTimedTasks() {
 
         // go through each task

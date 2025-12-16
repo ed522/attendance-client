@@ -71,6 +71,9 @@ public class BaseApplication extends Application {
                 stage.setFullScreen(!stage.isFullScreen());
             }
         });
+        scene.setOnMouseClicked(e -> {
+            fxmlLoader.<CodeViewController>getController().forceCodeGeneration();
+        });
 
         stage.setOnCloseRequest(x -> System.exit(0));
 
