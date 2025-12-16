@@ -376,18 +376,52 @@ public class AttendanceEndpoint {
         // look for hosts
         int tries = 0;
 
+        List<NetworkInterface> interfaces = new ArrayList<>();
+        NetworkInterface.getNetworkInterfaces().asIterator().forEachRemaining(interfaces::add);
+        String hostToUse = null;
+        System.out.println("got");
+
+        // go through each interface
+        // only look for non-loopback interfaces
+        // if a good interface is found, look for all addresses
+        // in those addresses, if one is non-loopback, assign it but keep looking
+        // if that address is also not link-local, use it and break out of both loops
+        mainLoop:
+        for (NetworkInterface n : interfaces) {
+
+            if (!n.isLoopback() && n.isUp()) {
+
+                List<InetAddress> addresses = new ArrayList<>();
+                n.getInetAddresses().asIterator().forEachRemaining(addresses::add);
+                for (InetAddress address : addresses) {
+                    if (!address.isLoopbackAddress() && hostToUse == null) {
+                        hostToUse = address.getHostAddress();
+                    }
+                    if (!address.isLinkLocalAddress()) {
+                        hostToUse = address.getHostAddress();
+                        break mainLoop;
+                    }
+                }
+
+            }
+
+        }
+
+        if (hostToUse == null) throw new IOException("No valid interface found!");
+
         JsonObject object = new JsonObject();
         object.addProperty("app", "attendance");
         object.addProperty("type", "discovery");
         object.addProperty("version", BaseApplication.VERSION);
-        object.addProperty("host", InetAddress.getLocalHost().getHostAddress());
+        object.addProperty("host", hostToUse);
 
         byte[] message = object.toString().getBytes(StandardCharsets.UTF_8);
 
         while ((tries < maxTries || maxTries == 0)) {
+            tries++;
+
             DatagramPacket packet = new DatagramPacket(message, message.length);
             datagramSocket.send(packet);
-            tries++;
             try {
                 // if the server connects (future call does not throw) break
                 future.get(INTERVAL, TimeUnit.MILLISECONDS);
