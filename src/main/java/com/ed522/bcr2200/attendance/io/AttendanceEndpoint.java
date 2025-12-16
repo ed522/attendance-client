@@ -379,7 +379,6 @@ public class AttendanceEndpoint {
         List<NetworkInterface> interfaces = new ArrayList<>();
         NetworkInterface.getNetworkInterfaces().asIterator().forEachRemaining(interfaces::add);
         String hostToUse = null;
-        System.out.println("got");
 
         // go through each interface
         // only look for non-loopback interfaces
