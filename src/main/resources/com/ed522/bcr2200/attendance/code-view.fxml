@@ -8,7 +8,13 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ed522.bcr2200.attendance.CodeViewController">
    <bottom>
-       <HBox alignment="CENTER_RIGHT" prefHeight="65.0" prefWidth="800.0" BorderPane.alignment="CENTER_RIGHT">
+       <HBox alignment="CENTER_LEFT" prefHeight="65.0" prefWidth="800.0" BorderPane.alignment="CENTER_RIGHT">
+           <HBox prefHeight="100.0" prefWidth="200.0">
+               <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" fx:id="restart">
+                   <Image url="@assets/256-restart.png"/>
+               </ImageView>
+           </HBox>
+         <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
            <ImageView fx:id="networkGood" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                <Image url="@assets/32-network-good.png" />
             <HBox.margin>
@@ -59,6 +65,9 @@
                <font>
                    <Font size="70.0" />
                </font>
+            <graphic>
+               <HBox prefHeight="100.0" prefWidth="200.0" />
+            </graphic>
            </Label>
            <Label fx:id="codeLabel3" alignment="TOP_CENTER" contentDisplay="TOP" text="CODE3 NOT SET" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
                <font>
