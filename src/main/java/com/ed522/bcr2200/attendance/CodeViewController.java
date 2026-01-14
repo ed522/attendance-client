@@ -44,8 +44,9 @@ public class CodeViewController {
     @FXML private ImageView networkGood;
     @FXML private ImageView networkWarn;
     @FXML private ImageView networkErr;
+    @FXML private ImageView restart;
 
-    private final ScheduledExecutorService timedEventExecutor = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService timedEventExecutor = Executors.newScheduledThreadPool(1, Thread.ofVirtual().factory());
     private final ExecutorService communicatorExecutor = Executors.newSingleThreadExecutor(Thread.ofPlatform().daemon().factory());
     private final Map<TimedTask, Integer> timedEvents = new HashMap<>();
     private final SecureRandom random = new SecureRandom();
@@ -137,6 +138,8 @@ public class CodeViewController {
     @FXML
     public void initialize() {
 
+        this.restart.setOnMouseClicked(e -> System.exit(0));
+
         this.expiryBar.setProgress(0d);
 
         this.registerTask(this::updateExpiryBar, 0L);
@@ -161,6 +164,7 @@ public class CodeViewController {
                     this.networkGood.setVisible(true);
                     this.networkWarn.setVisible(false);
                     this.networkErr.setVisible(false);
+                    this.forceCodeGeneration();
                 }
                 case DISCONNECTED -> {
                     this.networkGood.setVisible(false);
