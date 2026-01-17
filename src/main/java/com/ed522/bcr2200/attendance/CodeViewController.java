@@ -12,6 +12,8 @@ import javafx.scene.image.ImageView;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.sql.Date;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -35,6 +37,8 @@ public class CodeViewController {
 
     private static final Logger LOGGER = Logger.getLogger("CodeView");
     public static final int TICK_DELAY_MS = 100;
+    public static final int NUMBER_LENGTH = 6;
+    public static final int NUMBER_BOUNDS = 1_000_000;
 
     @FXML private Label codeLabel1;
     @FXML private Label codeLabel2;
@@ -79,7 +83,7 @@ public class CodeViewController {
 
     private VerificationCode generateCode(Instant generationInstant) throws InterruptedException {
         // six digits
-        int code = random.nextInt(100_000_000);
+        int code = random.nextInt(NUMBER_BOUNDS);
         Instant expiry = this.server.sendCodeAndWait(new VerificationCode(code, generationInstant), -1);
         return new VerificationCode(code, expiry);
     }
@@ -122,9 +126,12 @@ public class CodeViewController {
                 return;
             }
             this.expiryInstant = code1.time();
-            Platform.runLater(() -> codeLabel1.setText(String.valueOf(code1.value())));
-            Platform.runLater(() -> codeLabel2.setText(String.valueOf(code2.value())));
-            Platform.runLater(() -> codeLabel3.setText(String.valueOf(code3.value())));
+            NumberFormat format = DecimalFormat.getIntegerInstance();
+            format.setMinimumIntegerDigits(NUMBER_LENGTH);
+            format.setGroupingUsed(false);
+            Platform.runLater(() -> codeLabel1.setText(format.format(code1.value())));
+            Platform.runLater(() -> codeLabel2.setText(format.format(code2.value())));
+            Platform.runLater(() -> codeLabel3.setText(format.format(code3.value())));
             LOGGER.log(Level.INFO, "Generated new codes %d, %d and %d".formatted(code1.value(), code2.value(), code3.value()));
         }
 
